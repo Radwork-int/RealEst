@@ -6,6 +6,8 @@ interface PropertyCardPtops {
 }
 
 export const PropertyCard: React.FC<PropertyCardPtops> = ({property}) => {
+  console.log('Property:', property);
+  console.log('Address:', property.address);
 return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
       <img 
@@ -22,7 +24,10 @@ return (
         </div>
         <p className="text-sm text-gray-500 mb-4">{property.listedDate}</p>
         <p className="text-gray-600 text-sm line-clamp-3 mt-auto">
-          {property.description}
+          {property.description} +{"Hello"}
+        </p>
+        <p>
+          {property.address}
         </p>
       </div>
     </div>
