@@ -1,16 +1,58 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { SearchBar } from './components/SearchBar';
 import { PropertyList } from './components/PropertyList';
 import { sampleEstates } from './data/sampleEstates';
 
+const addressAliases: Record<string, string> = {
+  apartment: 'unit',
+  apt: 'unit',
+  ave: 'avenue',
+  avenue: 'avenue',
+  blvd: 'boulevard',
+  boulevard: 'boulevard',
+  court: 'court',
+  ct: 'court',
+  drive: 'drive',
+  dr: 'drive',
+  lane: 'lane',
+  ln: 'lane',
+  rd: 'road',
+  road: 'road',
+  st: 'street',
+  street: 'street',
+  unit: 'unit',
+};
+
+const getAddressKey = (address: string, city: string, state: string) => {
+  const normalizedAddress = address
+    .toLowerCase()
+    .replace(/#/g, ' unit ')
+    .replace(/[.,]/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((part) => addressAliases[part] ?? part)
+    .join(' ');
+
+  return `${normalizedAddress}, ${city.toLowerCase()}, ${state.toLowerCase()}`;
+};
+
 function App() {
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Filter properties based on the search query
   const filteredEstates = useMemo(() => {
-    return sampleEstates.filter((property) =>
-      property.source.toLowerCase().includes(searchQuery.toLowerCase())
+    const matches = sampleEstates.filter((property) =>
+      property.address.toLowerCase().includes(searchQuery.trim().toLowerCase())
     );
+    const uniqueEstates = new Map<string, (typeof sampleEstates)[number]>();
+
+    matches.forEach((property) => {
+      const addressKey = getAddressKey(property.address, property.city, property.state);
+      if (!uniqueEstates.has(addressKey)) {
+        uniqueEstates.set(addressKey, property);
+      }
+    });
+
+    return Array.from(uniqueEstates.values());
   }, [searchQuery]);
 
   return (
